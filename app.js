@@ -54,9 +54,16 @@ function updateUIState(listening) {
 
 async function translateText(text, from, to) {
     try {
-        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`);
+        // Use Google Translate (GTX) endpoint for significantly better quality
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+        const response = await fetch(url);
         const data = await response.json();
-        return data.responseData.translatedText;
+
+        // Google GTX response structure is nested arrays: [[["translated", "source", ...]]]
+        if (data && data[0] && data[0][0] && data[0][0][0]) {
+            return data[0][0][0];
+        }
+        return 'Translation unavailable.';
     } catch (error) {
         console.error('Translation error:', error);
         return 'Translation failed.';
@@ -70,6 +77,8 @@ function speakText(text, lang) {
     utterance.lang = lang;
     utterance.volume = parseFloat(volumeControl.value);
     utterance.rate = parseFloat(speedSelect.value);
+
+    // Resume background listening after speaking finishes if needed
     synthesis.speak(utterance);
 }
 
@@ -78,28 +87,32 @@ if (recognition) {
     recognition.onstart = () => {
         isListening = true;
         updateUIState(true);
+        console.log('Recognition started for:', recognition.lang);
     };
 
     recognition.onresult = async (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
-            } else {
-                interimTranscript += event.results[i][0].transcript;
-            }
-        }
-
         const originalDisplay = activeSpeaker === 'A' ? originalA : originalB;
         const translatedDisplay = activeSpeaker === 'A' ? translatedA : translatedB;
         const fromLang = activeSpeaker === 'A' ? langASelect.value : langBSelect.value;
         const toLang = activeSpeaker === 'A' ? langBSelect.value : langASelect.value;
 
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+
+        // Handle LIVE visual feedback
         if (finalTranscript) {
             originalDisplay.textContent = finalTranscript;
-            translatedDisplay.textContent = 'Translating...';
+            originalDisplay.classList.remove('interim');
+            translatedDisplay.textContent = '...'; // Thinking indicator
 
             const fromCode = fromLang.split('-')[0];
             const toCode = toLang.split('-')[0];
@@ -107,12 +120,9 @@ if (recognition) {
             const translation = await translateText(finalTranscript, fromCode, toCode);
             translatedDisplay.textContent = translation;
 
-            // Speak the translation
             speakText(translation, toLang);
-
-            // After Person A speaks, switch to Person B (optional logic, but typically users swap manually or wait)
-            // For now, let's keep it on the same speaker until they manually swap or provide feedback.
-        } else {
+        } else if (interimTranscript) {
+            // Keep the previous final text visible while adding interim
             originalDisplay.textContent = interimTranscript;
             originalDisplay.classList.add('interim');
         }

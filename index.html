@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translingo | Voice Bridge Real-time Translation</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="Translingo Logo" id="logo">
+            <h1>Translingo</h1>
+        </header>
+
+        <main class="controls-card">
+            <div class="lang-selectors">
+                <div class="setting-item">
+                    <label>Person A (Speaker)</label>
+                    <select id="lang-a">
+                        <option value="en-US">English</option>
+                        <option value="es-ES">Spanish</option>
+                        <option value="fr-FR">French</option>
+                        <option value="de-DE">German</option>
+                        <option value="zh-CN">Mandarin Chinese</option>
+                        <option value="ar-SA">Arabic</option>
+                        <option value="hi-IN">Hindi</option>
+                        <option value="ja-JP">Japanese</option>
+                        <option value="pt-PT">Portuguese</option>
+                        <option value="ru-RU">Russian</option>
+                    </select>
+                </div>
+                <div class="swap-icon">↔</div>
+                <div class="setting-item">
+                    <label>Person B (Speaker)</label>
+                    <select id="lang-b">
+                        <option value="es-ES" selected>Spanish</option>
+                        <option value="en-US">English</option>
+                        <option value="fr-FR">French</option>
+                        <option value="de-DE">German</option>
+                        <option value="zh-CN">Mandarin Chinese</option>
+                        <option value="ar-SA">Arabic</option>
+                        <option value="hi-IN">Hindi</option>
+                        <option value="ja-JP">Japanese</option>
+                        <option value="pt-PT">Portuguese</option>
+                        <option value="ru-RU">Russian</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings">
+                <div class="setting-item">
+                    <label>Volume</label>
+                    <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+                </div>
+                <div class="setting-item">
+                    <label>Speech Speed</label>
+                    <select id="speed">
+                        <option value="0.75">Slow</option>
+                        <option value="1" selected>Normal</option>
+                        <option value="1.25">Fast</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="start-btn" class="btn btn-start">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    Start Conversation
+                </button>
+                <button id="stop-btn" class="btn btn-stop">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 6h12v12H6z" />
+                    </svg>
+                    Stop Session
+                </button>
+            </div>
+        </main>
+
+        <section class="conversation-grid">
+            <div id="panel-a" class="person-card">
+                <h2>
+                    PERSON A
+                    <span class="pulse"></span>
+                </h2>
+                <div class="transcript-area">
+                    <div class="text-group">
+                        <span class="label">Original</span>
+                        <p id="original-a" class="original-text">...</p>
+                    </div>
+                    <div class="text-group">
+                        <span class="label">Translated</span>
+                        <p id="translated-a" class="translated-text">...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-b" class="person-card">
+                <h2>
+                    PERSON B
+                    <span class="pulse"></span>
+                </h2>
+                <div class="transcript-area">
+                    <div class="text-group">
+                        <span class="label">Original</span>
+                        <p id="original-b" class="original-text">...</p>
+                    </div>
+                    <div class="text-group">
+                        <span class="label">Translated</span>
+                        <p id="translated-b" class="translated-text">...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
